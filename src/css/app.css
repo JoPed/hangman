@@ -1,0 +1,11 @@
+html{
+    font-family: tahoma, sans-serif;
+    box-sizing: border-box;
+    background-color: #0f0e11;
+}
+
+*, *::after, *::before{
+    box-sizing: inherit;
+    margin: 0;
+    padding: 0;
+}
