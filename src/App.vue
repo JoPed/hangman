@@ -62,7 +62,8 @@ export default {
       wordsToGuess[Math.floor(Math.random() * wordsToGuess.length)]
     );
 
-    let gameOverText = "<span>you lost</span><br><br>Click <span>'Play again'</span> to start new game";
+    // <span class='font-bold text-xl'>You lost</span>\nClick <span class='font-bold'>'Play again'</span> to start new game
+    let gameOverText = "";
     const notificationRef = ref(null);
 
     const canvasRef = ref(null);

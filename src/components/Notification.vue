@@ -1,16 +1,14 @@
 <template>
   <div
     v-if="message != ''"
-    class="w-[200px] p-5 fixed z-50 left-1/2 -top-4 -translate-x-1/2 translate-y-[25%]  rounded-b shadow-[1px_3px_5px_rgba(242,135,5,.5)] bg-orange-50 text-center text-white-50"
-    :ref="
-      (el) => {
-        notificationRef = el;
-        getRef(el);}"
+    class="w-[200px] p-5 fixed z-50 left-1/2 -top-4 -translate-x-1/2 translate-y-[15%]  rounded-b shadow-[1px_3px_5px_rgba(242,135,5,.5)] bg-orange-50 text-center text-white-50 whitespace-pre-line"
+    :ref="(el) => {notificationRef = el;getRef(el);}"
+    v-html="message"
   ></div>
 </template>
 
 <script>
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref} from "vue";
 export default {
   props: ["message", "getRef"],
   setup(props) {
@@ -20,8 +18,9 @@ export default {
     onMounted(() => {
 
       if (props.message !== "") {
-        notificationRef.value.innerHtml = props.message;
-        // console.log(notificationRef.value.innerHtml)
+        
+        // notificationRef.value.innerHtml = props.message;
+        console.log(notificationRef.value.innerHtml)
         notificationRef.value.classList.add("active");
 
         // timeOut = setTimeout(() => {
@@ -34,7 +33,7 @@ export default {
         clearTimeout(timeOut);
     });
 
-    return { notificationRef };
+    return {notificationRef};
   }
 };
 </script>
