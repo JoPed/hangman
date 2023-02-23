@@ -9,6 +9,9 @@ module.exports = {
       colors: {
         white: {
           50: '#F3F3F4'
+        },
+        orange: {
+          50: 'rgb(242, 135, 5)'
         }
       }
     },

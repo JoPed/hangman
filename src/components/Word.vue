@@ -1,13 +1,32 @@
 <template>
-  
+  <div v-if="word" class="mt-8">
+    <span
+      v-for="char in splitWord(word)"
+      :key="char + 1"
+      :class="char === ' '
+          ? 'w-4 bg-white-50 h-1 z-40 mx-2 inline-block relative  opacity-0'
+          : 'w-4 h-[2px] bg-white-50 z-40 mx-2 inline-block relative'"
+    >
+      <span
+        class="absolute bottom-0 font-medium uppercase -translate-x-1/2 left-1/2 text-white-50"
+        ref="setCorrectLetterRef"
+      ></span>
+    </span>
+  </div>
 </template>
 
 <script>
 export default {
+  props: ["word", "setCorrectLetterRef"],
+  setup() {
+    const splitWord = (word) => {
+      return word.split("");
+    };
 
-}
+    return { splitWord };
+  },
+};
 </script>
 
 <style>
-
 </style>
