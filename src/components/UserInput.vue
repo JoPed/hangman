@@ -7,7 +7,7 @@
       <input
         @keydown="handleUserInput"
         @input="clearErrorMessage"
-        ref="guessInputRef"
+        :ref="getRef"
         type="text"
         class="block w-[100px] h-8 mx-3 p-1 text[1rem] font-normal text-white-50 bg-transparent border-2 border-solid border-white-50 appearance-none rounded focus:outline-0 focus:shadow-[0_0_0_.3rem_rgba(242,135,5,.5)] focus:border-[rgb(242,135,5)] disabled:shadow-none disabled:border-2 disabled:border-solid disabled:border-white-50 disabled:bg-white-50/[.15]"
       />
@@ -21,7 +21,7 @@
       </button>
       <button
         v-else
-        @click.prevent="handleUserInput"
+        @click="handleUserInput"
         class="block w-[100px] h-8 mx-3 text-[1rem] font-normal text-white-50 bg-transparent border-2 border-solid border-white-50 appearance-none rounded cursor-pointer hover:bg-white-50/20"
       >
         Submit
@@ -32,7 +32,7 @@
 
 <script>
 export default {
-  props: ["isGameOver", "handleUserInput", "guessInputRef", "resetGame"],
+  props: ["isGameOver", "handleUserInput", "getRef", "resetGame"],
   setup(props, { emit }) {
     const resetError = () => {
       console.log("testiong");

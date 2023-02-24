@@ -1,6 +1,7 @@
 <template>
   <div class="w-full min-[768px]:w-10/12 min-[992px]:w-6/12 mx-auto">
     <canvas
+    id="game"
       :ref="
         (el) => {
           canvasRef = el;
