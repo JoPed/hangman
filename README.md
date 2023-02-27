@@ -1,5 +1,7 @@
 # hangman
 
+Hangman game made in Vue3 with Tailwind.
+
 ## Project setup
 ```
 npm install
