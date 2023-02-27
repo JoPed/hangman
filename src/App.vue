@@ -71,12 +71,17 @@ export default {
     // A ref to every correct letter shown above the '-'
     const correctLetterRef = ref([]);
 
+    // const word = ref(
+    //   wordsToGuess[Math.floor(Math.random() * wordsToGuess.length)]
+    // );
+
     const word = ref(
-      wordsToGuess[Math.floor(Math.random() * wordsToGuess.length)]
+      'c#'
     );
 
     //* props for notification component
-    const gameOverText = ref("");
+    const gameOverText = ref({
+    });
     const notificationRef = ref(null);
 
     //*props for canvas component
@@ -89,18 +94,20 @@ export default {
     // used for prevGuesses before being push into prevGuesses array
     const emptyArr = [];
     const context = ref(null);
-    let spacesInWord = 0;
+    const spacesInWord = ref(0);
     let playerScore = ref(0);
     let playerLives = ref(10);
     let wrongGuessesText = "Wrong guesses: ";
     let guess = "";
 
     const winCheck = () => {
-      if (playerScore.value === word.value.length - spacesInWord) {
+      if (playerScore.value === word.value.length - spacesInWord.value) {
         isGameOver.value = true;
         guessInputRef.value.disabled = true;
-        gameOverText.value =
-          "<span class='text-xl font-bold'>You rock</span><br><br>Click <span class='font-bold'>'Play again'</span> to start new game";
+        gameOverText.value = {
+          msg: "<span class='text-xl font-bold'>You rock</span><br><br>Click <span class='font-bold'>'Play again'</span> to start new game",
+          class: "bg-green-700"
+        }
       }
     };
 
@@ -116,7 +123,7 @@ export default {
       playerLives.value = 10;
       guessInputRef.value.disabled = false;
       guessInputRef.value.focus();
-      gameOverText.value = '';
+      gameOverText.value = "";
       clearCanvas();
       drawWrongGuessesText();
     };
@@ -189,20 +196,21 @@ export default {
       context.value.fillStyle = "white";
       context.value.font = "30px Source Code Pro, sans-serif";
       context.value.fillText(wrongGuessesText, 10, 25);
-    }
+    };
 
     //*Set focus to the input when site in ready
     onMounted(() => {
       guessInputRef.value.focus();
       drawWrongGuessesText();
-      
+      spacesInWord.value = word.value.split(" ").length - 1;
     });
 
+    // watching for chages of the word ref, and then updating the spacesinword variable when ever the word is changed
     watch(
-      () => correctLetterRef.value,
+      () => word.value,
       () => {
         guessInputRef.value.focus();
-        spacesInWord = word.value.split(" ").length - 1;
+        spacesInWord.value = word.value.split(" ").length - 1;
       }
     );
 
@@ -211,8 +219,10 @@ export default {
       winCheck();
 
       if (newLives <= 0) {
-        gameOverText.value =
-          "<span class='text-xl font-bold'>You lost</span>\nClick <span class='font-bold'>'Play again'</span> to start new game";
+        gameOverText.value = {
+          msg: "<span class='text-xl font-bold'>You lost</span>\nClick <span class='font-bold'>'Play again'</span> to start new game",
+          class: "bg-red-700"
+        }
         isGameOver.value = true;
         guessInputRef.value.disabled = true;
       }
@@ -233,7 +243,7 @@ export default {
       wrongGuesses,
       gameOverText,
       notificationRef,
-      prevGuesses
+      prevGuesses,
     };
   },
 };
