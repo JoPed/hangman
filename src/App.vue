@@ -1,4 +1,4 @@
-<template >
+span<template >
   <Description />
 
   <main
@@ -59,25 +59,24 @@ export default {
     ErrorMessage,
     Word,
     Canvas,
-    Notification
+    Notification,
   },
   setup() {
-
     //* props for userinput and error message
     const inputError = ref("");
-    let isGameOver = false;
+    const isGameOver = ref(false);
     const guessInputRef = ref(null);
 
-    //* props for word component 
+    //* props for word component
     // A ref to every correct letter shown above the '-'
-    const correctLetterRef= ref([]);
-    
+    const correctLetterRef = ref([]);
+
     const word = ref(
       wordsToGuess[Math.floor(Math.random() * wordsToGuess.length)]
     );
 
     //* props for notification component
-    let gameOverText = "";
+    const gameOverText = ref("");
     const notificationRef = ref(null);
 
     //*props for canvas component
@@ -86,88 +85,84 @@ export default {
 
     //*used for logic, inside App.vue
     const wrongGuesses = ref([]);
-    let prevGuesses = [];
+    let prevGuesses = ref([]);
+    // used for prevGuesses before being push into prevGuesses array
+    const emptyArr = [];
     const context = ref(null);
     let spacesInWord = 0;
     let playerScore = ref(0);
     let playerLives = ref(10);
     let wrongGuessesText = "Wrong guesses: ";
-    let guess = '';
-
-    const compKey = ref(0);
-
-    const forceRerender = () => {
-      compKey.value += 1;
-    }
-    
+    let guess = "";
 
     const winCheck = () => {
-      if(playerScore.value === word.value.length - spacesInWord){
-        isGameOver = true;
+      if (playerScore.value === word.value.length - spacesInWord) {
+        isGameOver.value = true;
         guessInputRef.value.disabled = true;
-        gameOverText = "<span class='text-xl font-bold'>You rock</span><br><br>Click <span class='font-bold'>'Play again'</span> to start new game";
+        gameOverText.value =
+          "<span class='text-xl font-bold'>You rock</span><br><br>Click <span class='font-bold'>'Play again'</span> to start new game";
       }
     };
 
     const resetGame = () => {
-      correctLetterRef.value.forEach(ref => ref.innerHTML = "");
-      word.value = wordsToGuess[Math.floor(Math.random() * wordsToGuess.length)];
-      wrongGuesses = [];
-      isGameOver = false;
+      correctLetterRef.value.forEach((ref) => (ref.innerHTML = ""));
+      word.value =
+        wordsToGuess[Math.floor(Math.random() * wordsToGuess.length)];
+      wrongGuesses.value.length = 0;
+      isGameOver.value = false;
       playerScore.value = 0;
-      prevGuesses = [];
+      prevGuesses.value.length = 0;
+      emptyArr.length = 0;
       playerLives.value = 10;
       guessInputRef.value.disabled = false;
       guessInputRef.value.focus();
+      gameOverText.value = '';
       clearCanvas();
+      drawWrongGuessesText();
     };
 
     const handleGuess = () => {
-
       guess = guessInputRef.value.value.toLowerCase();
 
-      if(guess.length > 1){
-        inputError.value = 'Only one letter at a time';
-      }
-      else if(guess.length === 0 || guess === ' ') {
-        inputError.value = 'You have to type a letter between a-z';
+      if (guess.length > 1) {
+        inputError.value = "Only one letter at a time";
+        return;
+      } else if (guess.length === 0 || guess === " " || !isNaN(guess)) {
+        inputError.value = "You have to type a letter between a-z";
+        return;
       }
 
       // loop through the selected word
-      for(let i = 0; i < word.value.length; i++){
-
+      for (let i = 0; i < word.value.length; i++) {
         /* if the guessed letter matched at least one letter of the selected word
         and the guess hasn't been made previous */
-        if(word.value[i] === guess && !prevGuesses.includes(guess)){
-
-          // console.log(correctLetterRef.value[i]);
+        if (word.value[i] === guess && !prevGuesses.value.includes(guess)) {
           correctLetterRef.value[i].innerHTML = guess;
 
           guessInputRef.value.value = "";
 
-          console.log(guess);
-
           playerScore.value += 1;
-          prevGuesses.push(guess);
+          emptyArr.push(guess);
+        } else if (prevGuesses.value.includes(guess)) {
+          inputError.value = "You already guessed that letter";
         }
       }
+
+      prevGuesses.value.push(...emptyArr);
 
       /*Check the selected word for the guessed value
       if not the guessed value is present in the selected word, value of checkwrongguess will be -1 */
       let checkWrongGuess = word.value.indexOf(guess);
 
-      if(checkWrongGuess === -1 && !wrongGuesses.value.includes(' ' + guess)){
-        wrongGuesses.value.push(' ' + guess);
-        guessInputRef.value.value = '';
+      if (checkWrongGuess === -1 && !wrongGuesses.value.includes(" " + guess)) {
+        wrongGuesses.value.push(" " + guess);
+        guessInputRef.value.value = "";
         playerLives.value -= 1;
-        forceRerender();
 
         draw();
+      } else if (wrongGuesses.value.includes(" " + guess)) {
+        inputError.value = "You already guessed that letter";
       }
-      else if (wrongGuesses.value.includes(' ' + guess)){
-        inputError.value = 'You already guessed that letter';
-      }
-
     };
 
     const handleUserInput = (event) => {
@@ -182,19 +177,25 @@ export default {
     };
 
     const drawWrongGuesses = () => {
-      const wrongGuessesUppercase = wrongGuesses.value.map((w) => w.toUpperCase());
+      const wrongGuessesUppercase = wrongGuesses.value.map((w) =>
+        w.toUpperCase()
+      );
 
       context.value.fillText(wrongGuessesUppercase, 10, 70);
     };
 
-    //*Set focus to the input when site in ready
-    onMounted(() => {
-      guessInputRef.value.focus();
-
+    const drawWrongGuessesText = () => {
       context.value = canvasRef.value.getContext("2d");
       context.value.fillStyle = "white";
       context.value.font = "30px Source Code Pro, sans-serif";
       context.value.fillText(wrongGuessesText, 10, 25);
+    }
+
+    //*Set focus to the input when site in ready
+    onMounted(() => {
+      guessInputRef.value.focus();
+      drawWrongGuessesText();
+      
     });
 
     watch(
@@ -205,27 +206,19 @@ export default {
       }
     );
 
-    watch([playerScore, playerLives],() => {
-        winCheck();
+    // newLives/newScore is a parameter (could call it whatever) i automaticly get access to when watching a certain value
+    watch([playerScore, playerLives], ([newScore, newLives]) => {
+      winCheck();
 
-        if (playerLives.value <= 0) {
-          gameOverText =
-            "<span class='text-xl font-bold'>You lost</span>\nClick <span class='font-bold'>'Play again'</span> to start new game";
-          isGameOver = true;
-          guessInputRef.value.disabled = true;
-        }
-
-        console.log(playerScore.value);
-        console.log(playerLives.value);
-        
-        drawWrongGuesses();
+      if (newLives <= 0) {
+        gameOverText.value =
+          "<span class='text-xl font-bold'>You lost</span>\nClick <span class='font-bold'>'Play again'</span> to start new game";
+        isGameOver.value = true;
+        guessInputRef.value.disabled = true;
       }
-    );
 
-    const test = () => {
-      console.log('test');
-      wrongGuesses.value.push('a');
-    }
+      drawWrongGuesses();
+    });
 
     return {
       inputError,
@@ -240,8 +233,7 @@ export default {
       wrongGuesses,
       gameOverText,
       notificationRef,
-      prevGuesses,
-      compKey
+      prevGuesses
     };
   },
 };
