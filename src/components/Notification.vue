@@ -19,7 +19,6 @@ export default {
     watch(() => props.message.msg , () => {
 
       if (props.message.msg !== "") {
-        console.log(notificationRef.value);
         notificationRef.value.classList.add("active", props.message.class);
 
         timeOut = setTimeout(() => {

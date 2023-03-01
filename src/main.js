@@ -10,7 +10,19 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 library.add(faXmark);
 
 
-
 createApp(App).use(router)
 .component('font-awesome-icon', FontAwesomeIcon)
+.directive('autofocus', {
+    mounted: (el) => {
+        el.focus();
+    }
+})
+.directive('insertMessage', (canvasElement, binding) => {
+        const ctx = canvasElement.getContext('2d');
+        ctx.fillStyle = "white";
+        ctx.font = "25px Source Code Pro, sans-serif";
+        ctx.fillText(binding.value, 10, 25);
+        console.log(ctx)        
+    }
+)
 .mount('#app')

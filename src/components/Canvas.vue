@@ -8,6 +8,7 @@
           getRef(el);
         }
       "
+      v-insert-message="wrongGuessesText"
       class="mt-4 w-full h-[500px] border-2 border-dashed border-white-50"
     />
   </div>
@@ -23,6 +24,9 @@ const props = defineProps({
   clearCanvasRef: {
     type: Boolean,
   },
+  wrongGuessesText: {
+    type: String
+  }
 });
 
 const canvasRef = ref();
