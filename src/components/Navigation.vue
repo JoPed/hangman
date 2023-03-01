@@ -1,7 +1,7 @@
 <template>
-  <header class="container bg-[#0f0e11] h-[100px] sticky top-0 z-50 mx-auto">
-    <nav class="container h-full flex justify-center items-center mx-auto">
-      <ul class="list-none flex" :class="isMenuOpen ? 'active' : ''">
+  <header class="container bg-black-50 h-[100px] sticky top-0 z-50 mx-auto">
+    <nav class="container flex items-center justify-center h-full mx-auto">
+      <ul class="flex list-none" :class="isMenuOpen ? 'active' : ''">
         <li @click="closeMenu" class="p-[15px] select-none">
           <router-link
             :to="{ name: 'Game' }"

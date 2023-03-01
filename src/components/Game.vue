@@ -1,9 +1,22 @@
 <template>
   <Description />
 
-  <main
-    class="max-w-5xl mx-auto min-[768px]:max-w-[720px] min-[992px]:max-w-[960px] min-[1200px]:max-w-[1140px] min-[1400px]:max-w-[1320px] mt-6 text-center pb-3 relative"
+  <select
+    class="my-4 bg-transparent border-2 border-solid rounded border-white-50 text-white-50"
+    @input="handleGameModeChoise"
   >
+    <option class="text-white-50 bg-black-50" selected disabled>
+      Choose game mode
+    </option>
+    <option class="text-white-50 bg-black-50" value="predefined">
+      Existing words (related to webdevelopment)
+    </option>
+    <option class="text-white-50 bg-black-50" value="yourWords">
+      Your locally stored words
+    </option>
+  </select>
+
+  <div v-if="choiseMade != ''">
     <UserInput
       v-model:inputError="inputError"
       :get-ref="
@@ -27,16 +40,16 @@
       "
       :clearCanvasRef="clearCanvasRef"
     />
+  </div>
 
-    <Notification
-      :message="gameOverText"
-      :get-ref="
-        (el) => {
-          notificationRef = el;
-        }
-      "
-    />
-  </main>
+  <Notification
+    :message="gameOverText"
+    :get-ref="
+      (el) => {
+        notificationRef = el;
+      }
+    "
+  />
 </template>
 
 <script>
@@ -52,7 +65,7 @@ import { drawArray, clearCanvas } from "./scripts/DrawFunctions";
 import { onMounted, ref, watch } from "vue";
 
 export default {
-name: "Game",
+  name: "Game",
   components: {
     Description,
     UserInput,
@@ -70,14 +83,12 @@ name: "Game",
     //* props for word component
     // A ref to every correct letter shown above the '-'
     const correctLetterRef = ref([]);
+    const userWords = ref([]);
 
-    const word = ref(
-      wordsToGuess[Math.floor(Math.random() * wordsToGuess.length)]
-    );
+    const word = ref("");
 
     //* props for notification component
-    const gameOverText = ref({
-    });
+    const gameOverText = ref({});
     const notificationRef = ref(null);
 
     //*props for canvas component
@@ -95,6 +106,7 @@ name: "Game",
     let playerLives = ref(10);
     let wrongGuessesText = "Wrong guesses: ";
     let guess = "";
+    const choiseMade = ref("");
 
     const winCheck = () => {
       if (playerScore.value === word.value.length - spacesInWord.value) {
@@ -102,8 +114,8 @@ name: "Game",
         guessInputRef.value.disabled = true;
         gameOverText.value = {
           msg: "<span class='text-xl font-bold'>You rock</span><br><br>Click <span class='font-bold'>'Play again'</span> to start new game",
-          class: "bg-green-700"
-        }
+          class: "bg-green-700",
+        };
       }
     };
 
@@ -194,19 +206,58 @@ name: "Game",
       context.value.fillText(wrongGuessesText, 10, 25);
     };
 
+    const handleGameModeChoise = (e) => {
+      choiseMade.value = e.target.value;
+    };
+
+    const selectWord = () => {
+      if (choiseMade.value === "yourWords" && localStorage.getItem("words")) {
+        gameOverText.value = {
+          msg: "Your words was found, and one has been selected.\nStart game, when you are ready",
+          class: "bg-green-700",
+        };
+
+        // word =
+      } else if (choiseMade.value === "predefined") {
+        gameOverText.value = {
+          msg: "One of the predefined webrelated words will be selected.\nStart game, when you are ready",
+          class: "bg-green-700",
+        };
+        word.value =
+          wordsToGuess[Math.floor(Math.random() * wordsToGuess.length)];
+      } else if (!localStorage.getItem("words")) {
+        gameOverText.value = {
+          msg: "Your words was not found. Try making/saving new words on the New Words page.\nStart game, when you are ready",
+          class: "bg-red-700",
+        };
+        choiseMade.value = "";
+      }
+    };
+
     //*Set focus to the input when site in ready
     onMounted(() => {
-      guessInputRef.value.focus();
-      drawWrongGuessesText();
-      spacesInWord.value = word.value.split(" ").length - 1;
+      if (guessInputRef.value) {
+        guessInputRef.value.focus();
+        drawWrongGuessesText();
+        spacesInWord.value = word.value.split(" ").length - 1;
+      }
     });
+
+    watch(
+      () => choiseMade.value,
+      () => {
+        selectWord();
+      }
+    );
 
     // watching for chages of the word ref, and then updating the spacesinword variable when ever the word is changed
     watch(
       () => word.value,
       () => {
-        guessInputRef.value.focus();
-        spacesInWord.value = word.value.split(" ").length - 1;
+        if (guessInputRef.value) {
+          guessInputRef.value.focus();
+          spacesInWord.value = word.value.split(" ").length - 1;
+        }
       }
     );
 
@@ -217,8 +268,8 @@ name: "Game",
       if (newLives <= 0) {
         gameOverText.value = {
           msg: "<span class='text-xl font-bold'>You lost</span>\nClick <span class='font-bold'>'Play again'</span> to start new game",
-          class: "bg-red-700"
-        }
+          class: "bg-red-700",
+        };
         isGameOver.value = true;
         guessInputRef.value.disabled = true;
       }
@@ -240,11 +291,12 @@ name: "Game",
       gameOverText,
       notificationRef,
       prevGuesses,
+      choiseMade,
+      handleGameModeChoise,
     };
   },
-}
+};
 </script>
 
 <style>
-
 </style>

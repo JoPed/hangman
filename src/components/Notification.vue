@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { onMounted, onUnmounted, ref, watch} from "vue";
+import { onUnmounted, ref, watch} from "vue";
 export default {
   props: ["message", "getRef"],
   setup(props) {
@@ -24,7 +24,7 @@ export default {
 
         timeOut = setTimeout(() => {
           notificationRef.value.classList.remove("active", props.message.class);
-        }, 4000);
+        }, 2000);
       }
     });
 

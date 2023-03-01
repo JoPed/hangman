@@ -12,6 +12,9 @@ module.exports = {
         },
         orange: {
           50: 'rgb(242, 135, 5)'
+        },
+        black: {
+          50: '#0f0e11'
         }
       }
     },

@@ -1,7 +1,8 @@
 <template >
   <Navigation />
-
-  <router-view />
+  <main class="container w-[calc(100vw-23px)] relative pb-3 mx-auto mt-6 text-center">
+    <router-view />
+  </main>
 </template>
 
 <script>
