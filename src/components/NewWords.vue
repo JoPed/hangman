@@ -61,11 +61,19 @@
     Save words
   </button>
   <button
+    class="inline-block w-[125px] ml-1 py-2 mx-auto text-[1rem] font-normal text-white-50 bg-green-600 border-2 border-solid border-white-50 appearance-none rounded cursor-pointer hover:bg-green-700/70"
+    @click="loadWords"
+  >
+    Load words
+  </button>
+  <button
     class="inline-block w-[125px] ml-1 py-2 mx-auto text-[1rem] font-normal text-white-50 bg-red-600 border-2 border-solid border-white-50 appearance-none rounded cursor-pointer hover:bg-red-700/70"
     @click="deleteWords"
   >
     Delete words
   </button>
+
+  
 </template>
 
 <script>
@@ -79,10 +87,7 @@ export default {
     const addWord = (e) => {
       e.preventDefault();
 
-      console.log("first");
-
       if (tempWord.value) {
-        console.log("second");
         if (!words.value.includes(tempWord.value)) {
           words.value.push(tempWord.value);
         }
@@ -103,7 +108,14 @@ export default {
       localStorage.removeItem("words");
     };
 
-    return { tempWord, addWord, words, removeWord, saveWords, deleteWords };
+    const loadWords = () => {
+
+      if(localStorage.getItem('words')){
+        words.value.push(...JSON.parse(localStorage.getItem('words')));
+      }
+    }
+
+    return { tempWord, addWord, words, removeWord, saveWords, deleteWords, loadWords };
   },
 };
 </script>

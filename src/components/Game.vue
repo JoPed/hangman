@@ -1,14 +1,13 @@
 <template>
   <Description />
 
-  <!--  -->
-
   <select
-    class="my-4 bg-transparent border-2 border-solid rounded border-white-50 text-white-50"
+    class="my-4 bg-transparent border-2 border-solid rounded border-white-50 text-white-50 w-full min-[350px]:w-1/2 lg:w-1/3"
     @input="handleGameModeChoise"
     v-if="showGameModes"
+    v-model="choiseMade"
   >
-    <option class="text-white-50 bg-black-50" selected disabled>
+    <option class="text-white-50 bg-black-50" value="default" disabled>
       Choose game mode
     </option>
     <option class="text-white-50 bg-black-50" value="predefined">
@@ -19,32 +18,33 @@
     </option>
   </select>
 
-  <div>
-    <UserInput
-      v-model:inputError="inputError"
-      :get-ref="
-        (el) => {
-          guessInputRef = el;
-        }
-      "
-      :handleUserInput="handleUserInput"
-      :isGameOver="isGameOver"
-      :resetGame="resetGame"
-    />
+  <!-- <button @click="showGameModes = true" v-if="prevGuesses.length <= 0" class="block p-1 mx-auto mt-4 mb-6 text-[1rem] font-normal text-white-50 bg-transparent border-2 border-solid border-white-50 appearance-none rounded cursor-pointer hover:bg-white-50/20">Change mode</button> -->
 
-    <ErrorMessage :inputError="inputError" class="container" />
-    <Word :word="word" :correctLetterRef="correctLetterRef" />
+  <UserInput
+    v-model:inputError="inputError"
+    :get-ref="
+      (el) => {
+        guessInputRef = el;
+      }
+    "
+    :handleUserInput="handleUserInput"
+    :isGameOver="isGameOver"
+    :resetGame="resetGame"
+  />
 
-    <Canvas
-      :get-ref="
-        (el) => {
-          canvasRef = el;
-        }
-      "
-      :clearCanvasRef="clearCanvasRef"
-      :wrongGuessesText="wrongGuessesText"
-    />
-  </div>
+  <ErrorMessage :inputError="inputError" class="container" />
+
+  <Word :word="word" :correctLetterRef="correctLetterRef" />
+
+  <Canvas
+    :get-ref="
+      (el) => {
+        canvasRef = el;
+      }
+    "
+    :clearCanvasRef="clearCanvasRef"
+    :wrongGuessesText="wrongGuessesText"
+  />
 
   <Notification
     :message="gameOverText"
@@ -65,7 +65,7 @@ import Canvas from "./Canvas.vue";
 import Notification from "./Notification.vue";
 import { wordsToGuess } from "./scripts/WordsToGuess";
 import { drawArray, clearCanvas } from "./scripts/DrawFunctions";
-import {onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 export default {
   name: "Game",
@@ -109,7 +109,7 @@ export default {
     let playerLives = ref(10);
     const wrongGuessesText = ref("Wrong guesses: ");
     let guess = "";
-    const choiseMade = ref("");
+    const choiseMade = ref("default");
     const showGameModes = ref(true);
 
     const winCheck = () => {
@@ -125,10 +125,13 @@ export default {
 
     const resetGame = (newWord) => {
 
-      if(newWord){
+        correctLetterRef.value.forEach((ref) => (ref.innerHTML = ""));
+        correctLetterRef.value.length = 0;
+
+      if (newWord) {
         selectWord();
       }
-      correctLetterRef.value.forEach((ref) => (ref.innerHTML = ""));
+
       wrongGuesses.value.length = 0;
       isGameOver.value = false;
       playerScore.value = 0;
@@ -205,15 +208,6 @@ export default {
       context.value.fillText(wrongGuessesUppercase, 10, 70);
     };
 
-    // const drawWrongGuessesText = () => {
-    //   context.value = canvasRef.value.getContext("2d");
-
-    //   context.value.fillStyle = "white";
-    //   context.value.font = "30px Source Code Pro, sans-serif";
-    //   context.value.fillText(wrongGuessesText.value, 10, 25);
-    //   console.log(context.value)
-    // };
-
     const handleGameModeChoise = (e) => {
       choiseMade.value = e.target.value;
     };
@@ -225,10 +219,11 @@ export default {
           class: "bg-green-700",
         };
         // get the words for localstorage
-        userWords.value.push(...JSON.parse(localStorage.getItem('words')));
-        
+        userWords.value.push(...JSON.parse(localStorage.getItem("words")));
+
         // get a random word from localstorage and use that as selected word
-        word.value = userWords.value[Math.floor(Math.random() * userWords.value.length)];
+        word.value =
+          userWords.value[Math.floor(Math.random() * userWords.value.length)];
 
       } else if (choiseMade.value === "predefined") {
         gameOverText.value = {
@@ -237,31 +232,33 @@ export default {
         };
         word.value =
           wordsToGuess[Math.floor(Math.random() * wordsToGuess.length)];
-          
+
       } else if (!localStorage.getItem("words")) {
         gameOverText.value = {
           msg: "Your words was not found. Try making/saving new words on the New Words page.\nStart game, when you are ready",
           class: "bg-red-700",
         };
-        choiseMade.value = "";
+        choiseMade.value = "default";
       }
     };
 
     onMounted(() => {
-      context.value = canvasRef.value.getContext('2d');
-    }) 
+      context.value = canvasRef.value.getContext("2d");
+    });
 
     watch(
       () => choiseMade.value,
       () => {
-        resetGame(false);
         selectWord();
       }
     );
 
-    watch(() => guessInputRef.value, () => {
+    watch(
+      () => guessInputRef.value,
+      () => {
         spacesInWord.value = word.value.split(" ").length - 1;
-    })
+      }
+    );
 
     // watching for chages of the word ref, and then updating the spacesinword variable when ever the word is changed
     watch(
@@ -272,6 +269,7 @@ export default {
         }
       }
     );
+
 
     // newLives/newScore is a parameter (could call it whatever) i automaticly get access to when watching a certain value
     watch([playerScore, playerLives], ([newScore, newLives]) => {
@@ -286,8 +284,9 @@ export default {
         guessInputRef.value.disabled = true;
       }
 
-      if(context.value) {drawWrongGuesses();}
-      
+      if (context.value) {
+        drawWrongGuesses();
+      }
     });
 
     return {
@@ -307,7 +306,7 @@ export default {
       choiseMade,
       handleGameModeChoise,
       showGameModes,
-      wrongGuessesText
+      wrongGuessesText,
     };
   },
 };
